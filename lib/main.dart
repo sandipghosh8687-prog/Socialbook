@@ -81,35 +81,18 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: const InputDecoration(
                     labelText: 'Password',
                     border: OutlineInputBorder(),
-onPressed: () async {
-    final prefs = await SharedPreferences.getInstance();
+                    prefixIcon: Icon(Icons.lock),
+                  ),
+                ),
 
-      final savedEmail = prefs.getString('account_email');
-        final savedPassword = prefs.getString('account_password');
+                const SizedBox(height: 20),
 
-          final email = emailController.text.trim();
-            final password = passwordController.text;
-
-              if (email == savedEmail && password == savedPassword) {
-                  if (!mounted) return;
-
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
                       Navigator.pushReplacement(
-                            context,
-                                  MaterialPageRoute(
-                                          builder: (_) => const HomePage(),
-                                                ),
-                                                    );
-                                                      } else {
-                                                          if (!mounted) return;
-
-                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                    const SnackBar(
-                                                                            content: Text('Invalid email or password'),
-                                                                                  ),
-                                                                                      );
-                                                                                        }
-                                                                                        },
-}
                         context,
                         MaterialPageRoute(
                           builder: (_) => const HomePage(),
@@ -188,18 +171,6 @@ class HomePage extends StatelessWidget {
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.chat),
-            ),
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ProfilePage(),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.person),
-            
           ),
         ],
       ),
@@ -215,7 +186,7 @@ class HomePage extends StatelessWidget {
               'What’s on your mind?',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
-              onTap: () { Navigator.push(context, MaterialPageRoute(builder: (_) => const CreatePostPage())); },
+          onTap: () { showDialog(context: context, builder: (dialogContext) { final controller = TextEditingController(); return AlertDialog(title: const Text("Create Post"), content: TextField(controller: controller, maxLines: 5, decoration: const InputDecoration(hintText: "What's on your mind?")), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text("Cancel")), ElevatedButton(onPressed: () { if (controller.text.trim().isNotEmpty) { Navigator.pop(dialogContext); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Post created successfully!"))); } }, child: const Text("Post"))]); }); },
           ),
 
           const Divider(),
@@ -592,146 +563,3 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   }
 }
 
-class CreatePostPage extends StatefulWidget {
-  const CreatePostPage({super.key});
-
-  @override
-  State<CreatePostPage> createState() => _CreatePostPageState();
-}
-
-class _CreatePostPageState extends State<CreatePostPage> {
-  final TextEditingController _postController = TextEditingController();
-
-  @override
-  void dispose() {
-    _postController.dispose();
-    super.dispose();
-  }
-
-  void _publishPost() {
-    if (_postController.text.trim().isEmpty) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Post published successfully!')),
-    );
-
-    Navigator.pop(context);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Post'),
-        actions: [
-          TextButton(
-            onPressed: _publishPost,
-            child: const Text('POST'),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: TextField(
-          controller: _postController,
-          maxLines: 8,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: "What's on your mind?",
-            border: OutlineInputBorder(),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Profile'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          const CircleAvatar(
-            radius: 55,
-            child: Icon(Icons.person, size: 60),
-          ),
-          const SizedBox(height: 16),
-
-          const Center(
-            child: Text(
-              'Socialbook User',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          const Center(
-            child: Text(
-              'Welcome to my Socialbook profile!',
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
-              Column(
-                children: [
-                  Text('12',
-                      style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('Posts'),
-                ],
-              ),
-              Column(
-                children: [
-                  Text('25',
-                      style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('Friends'),
-                ],
-              ),
-              Column(
-                children: [
-                  Text('48',
-                      style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('Likes'),
-                ],
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 30),
-
-          ElevatedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.edit),
-            label: const Text('Edit Profile'),
-          ),
-
-          const SizedBox(height: 12),
-
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.people),
-            label: const Text('Friends'),
-          ),
-        ],
-      ),
-    );
-  }
-}
