@@ -236,7 +236,7 @@ class HomePage extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
-        onTap: (index) {},
+        onTap: (index) { if (index == 4) { showDialog(context: context, builder: (context) => const AlertDialog(title: Text("Profile"), content: Text("Your Socialbook Profile"))); } },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
