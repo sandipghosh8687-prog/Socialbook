@@ -1,27 +1,7 @@
+import 'dart:typed_data';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-void main() {
-  runApp(const SocialbookApp());
-}
-
-class SocialbookApp extends StatelessWidget {
-  const SocialbookApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Socialbook',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const LoginPage(),
-    );
-  }
-}
-
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,109 +14,135 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  bool isSignUp = false;
+
+  void continueToApp() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const SocialbookApp()),
+    );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(28),
             child: Column(
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
+
+                const Text(
+                  'S',
+                  style: TextStyle(
+                    fontSize: 82,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFC2185B),
+                  ),
+                ),
 
                 const Text(
                   'Socialbook',
                   style: TextStyle(
-                    fontSize: 40,
+                    fontSize: 34,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                    color: Color(0xFFC2185B),
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: 45),
 
-                const Text(
-                  'Connect with friends and family',
-                  style: TextStyle(fontSize: 16),
+                Text(
+                  isSignUp ? 'Create your account' : 'Welcome back',
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 25),
 
                 TextField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email or phone',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const HomePage(),
-                        ),
-                      );
-                    },
-                    child: const Text(
-                      'Log In',
-                      style: TextStyle(fontSize: 18),
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      color: Color(0xFFC2185B),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 15),
 
-                TextButton(
-                  onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const CreateAccountPage(),
+                TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    prefixIcon: const Icon(
+                      Icons.lock_outline,
+                      color: Color(0xFFC2185B),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
-                );
-              },
-                  child: const Text('Forgot password?'),
                 ),
 
-                const Divider(height: 30),
+                const SizedBox(height: 25),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
-                  child: OutlinedButton(
-                    onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const CreateAccountPage(),
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: continueToApp,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFC2185B),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: Text(
+                      isSignUp ? 'Create Account' : 'Login',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
-              );
-            },
-                    child: const Text(
-                      'Create New Account',
-                      style: TextStyle(fontSize: 17),
+
+                const SizedBox(height: 18),
+
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      isSignUp = !isSignUp;
+                    });
+                  },
+                  child: Text(
+                    isSignUp
+                        ? 'Already have an account? Login'
+                        : 'New to Socialbook? Sign Up',
+                    style: const TextStyle(
+                      color: Color(0xFFC2185B),
+                      fontSize: 16,
                     ),
                   ),
                 ),
@@ -149,417 +155,1289 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-class HomePage extends StatelessWidget {
+void main() {
+  runApp(
+    const MaterialApp(debugShowCheckedModeBanner: false, home: LoginPage()),
+  );
+}
+
+class ProfilePage extends StatefulWidget {
+  final String name;
+
+  const ProfilePage({super.key, required this.name});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final Set<String> friends = {'Rahul Das', 'Suman Ghosh', 'Amit Roy'};
+  bool get isFriend => friends.contains(widget.name);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Profile')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(
+              radius: 55,
+              backgroundColor: Color(0xFFE0ECFF),
+              child: Icon(Icons.person, color: Colors.blue, size: 60),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              widget.name,
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text('Socialbook User', style: TextStyle(fontSize: 17)),
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () {
+                setState(() {
+                  if (isFriend) {
+                    friends.remove(widget.name);
+                  } else {
+                    friends.add(widget.name);
+                  }
+                });
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      isFriend
+                          ? '${widget.name} is now your friend'
+                          : '${widget.name} removed from friends',
+                    ),
+                  ),
+                );
+              },
+              icon: Icon(isFriend ? Icons.people : Icons.person_add),
+              label: Text(isFriend ? 'Friends ✓' : 'Add Friend'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SocialbookApp extends StatelessWidget {
+  const SocialbookApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Socialbook',
+      theme: ThemeData(
+        useMaterial3: true,
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      ),
+      home: const HomePage(),
+    );
+  }
+}
+
+final Set<String> _sentFriendRequests = {};
+final Set<String> _acceptedFriendRequests = {};
+
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final List<Map<String, dynamic>> _friendRequestNotifications = [];
+  final Set<String> _declinedFriendRequests = {};
+  int selectedTab = 0;
+  Uint8List? selectedImageBytes;
+
+  final List<Map<String, dynamic>> posts = [
+    {
+      'name': 'Socialbook User',
+      'time': '2h ago',
+      'text': 'Welcome to Socialbook! 👋',
+      'likes': 12,
+      'dislikes': 0,
+      'comments': 4,
+    },
+    {
+      'name': 'Socialbook Team',
+      'time': '3h ago',
+      'text': 'This is your new social media app.',
+      'likes': 25,
+      'dislikes': 0,
+      'comments': 8,
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Socialbook',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.blue,
-          ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        titleSpacing: 18,
+        title: Row(
+          children: [
+            Container(
+              width: 45,
+              height: 45,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: Colors.white,
+              ),
+              child: const Center(
+                child: Text(
+                  'S',
+                  style: TextStyle(
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFFD81B60),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'Socialbook',
+              style: TextStyle(
+                color: Color(0xFFD81B60),
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
+            icon: const Icon(Icons.add, size: 27, color: Color(0xFFD81B60)),
+            onPressed: _showCreatePost,
           ),
           IconButton(
+            icon: const Icon(Icons.search, size: 27, color: Color(0xFFD81B60)),
+            onPressed: _showSearch,
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.chat_bubble_outline,
+              size: 29,
+              color: Color(0xFFD81B60),
+            ),
+            onPressed: _showMessages,
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.account_circle_outlined,
+              size: 32,
+              color: Color(0xFFD81B60),
+            ),
             onPressed: () {},
-            icon: const Icon(Icons.chat),
           ),
+          const SizedBox(width: 10),
         ],
       ),
-      body: ListView(
+      body: IndexedStack(
+        index: selectedTab,
         children: [
-          const SizedBox(height: 8),
-
-          ListTile(
-            leading: const CircleAvatar(
-              child: Icon(Icons.person),
-            ),
-            title: const Text(
-              'What’s on your mind?',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-          onTap: () { showDialog(context: context, builder: (dialogContext) { final controller = TextEditingController(); return AlertDialog(title: const Text("Create Post"), content: TextField(controller: controller, maxLines: 5, decoration: const InputDecoration(hintText: "What's on your mind?")), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text("Cancel")), ElevatedButton(onPressed: () { if (controller.text.trim().isNotEmpty) { Navigator.pop(dialogContext); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Post created successfully!"))); } }, child: const Text("Post"))]); }); },
-          ),
-
-          const Divider(),
-
-          Row(
-  mainAxisAlignment: MainAxisAlignment.spaceAround,
-  children: [
-    TextButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.thumb_up_outlined),
-      label: const Text('Like'),
-    ),
-    TextButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.thumb_down_outlined),
-      label: const Text('Dislike'),
-    ),
-    TextButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.comment_outlined),
-      label: const Text('Comment'),
-    ),
-    TextButton.icon(
-      onPressed: () {},
-      icon: const Icon(Icons.share_outlined),
-      label: const Text('Share'),
-    ),
-  ],
-),
-
-          const Divider(),
-
-          const PostCard(
-            name: 'Socialbook User',
-            text: 'Welcome to Socialbook! 👋',
-            likes: 12,
-            comments: 4,
-          ),
-
-          const PostCard(
-            name: 'Socialbook Team',
-            text: 'This is your new social media app.',
-            likes: 25,
-            comments: 8,
-          ),
+          _homeFeed(),
+          _simplePage(Icons.people_outline, 'Friends'),
+          _simplePage(Icons.notifications_none, 'Notifications'),
+          _simplePage(Icons.person_outline, 'Profile'),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) { if (index == 4) { showDialog(context: context, builder: (context) => const AlertDialog(title: Text("Profile"), content: Text("Your Socialbook Profile"))); } },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+      bottomNavigationBar: NavigationBar(
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+        backgroundColor: Colors.white,
+        indicatorColor: const Color(0xFFE0ECFF),
+        labelTextStyle: WidgetStatePropertyAll(
+          const TextStyle(color: Colors.blue),
+        ),
+        selectedIndex: selectedTab,
+        onDestinationSelected: (index) {
+          setState(() {
+            selectedTab = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined, color: Colors.blue),
+            selectedIcon: Icon(Icons.home, color: Colors.blue),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
+          NavigationDestination(
+            icon: Icon(Icons.people_outline, color: Colors.blue),
+            selectedIcon: Icon(Icons.people, color: Colors.blue),
             label: 'Friends',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
+          NavigationDestination(
+            icon: Icon(Icons.notifications_none, color: Colors.blue),
+            selectedIcon: Icon(Icons.notifications, color: Colors.blue),
             label: 'Notifications',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline, color: Colors.blue),
+            selectedIcon: Icon(Icons.person, color: Colors.blue),
             label: 'Profile',
           ),
         ],
       ),
     );
   }
-}
 
-class PostCard extends StatefulWidget {
-  final String name;
-  final String text;
-  final int likes;
-  final int comments;
-
-  const PostCard({
-    super.key,
-    required this.name,
-    required this.text,
-    required this.likes,
-    required this.comments,
-  });
-
-  @override
-  State<PostCard> createState() => _PostCardState();
-}
-
-class _PostCardState extends State<PostCard> {
-  late int _likes;
-  late int _dislikes;
-  late int _comments;
-  bool _liked = false;
-  bool _disliked = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _likes = widget.likes;
-    _dislikes = 0;
-    _comments = widget.comments;
-  }
-
-  void _like() {
-    setState(() {
-      if (_liked) {
-        _liked = false;
-        _likes--;
-      } else {
-        _liked = true;
-        _likes++;
-        if (_disliked) {
-          _disliked = false;
-          _dislikes--;
-        }
-      }
-    });
-  }
-
-  void _dislike() {
-    setState(() {
-      if (_disliked) {
-        _disliked = false;
-        _dislikes--;
-      } else {
-        _disliked = true;
-        _dislikes++;
-        if (_liked) {
-          _liked = false;
-          _likes--;
-        }
-      }
-    });
-  }
-
-  void _comment() {
-    setState(() {
-      _comments++;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Comment added!')),
+  Widget _homeFeed() {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(14, 15, 14, 20),
+      children: [
+        _createPostBox(),
+        const SizedBox(height: 16),
+        ...posts.map(
+          (post) => Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: _postCard(post),
+          ),
+        ),
+      ],
     );
   }
 
-  void _share() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Post shared!')),
+  Widget _createPostBox() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9F9FC),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E2E2)),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 27,
+            backgroundColor: Color(0xFFE0ECFF),
+            child: Icon(Icons.person, color: Colors.blue, size: 32),
+          ),
+          const SizedBox(width: 13),
+          Expanded(
+            child: GestureDetector(
+              onTap: _showCreatePost,
+              child: const Text(
+                "What's on your mind?",
+                style: TextStyle(fontSize: 19, color: Colors.grey),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+  Widget _postCard(Map<String, dynamic> post) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E2E2)),
+        boxShadow: const [
+          BoxShadow(
+            blurRadius: 3,
+            color: Color(0x11000000),
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 8, 8),
+            child: Row(
               children: [
                 const CircleAvatar(
-                  radius: 32,
-                  child: Icon(Icons.person),
+                  radius: 27,
+                  backgroundColor: Color(0xFFE0ECFF),
+                  child: Icon(Icons.person, color: Colors.blue, size: 32),
                 ),
-                const SizedBox(width: 16),
-                Text(
-                  widget.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        post['name'],
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            post['time'],
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.public,
+                            size: 15,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
+                IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
               ],
             ),
-
-            const SizedBox(height: 20),
-
-            Text(
-              widget.text,
-              style: const TextStyle(fontSize: 16),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
+              child: Text(post['text'], style: const TextStyle(fontSize: 19)),
             ),
-
-            const SizedBox(height: 12),
-
-            Text(
-              '$_likes likes • $_dislikes dislikes • $_comments comments',
+          ),
+          if (post['image'] != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.memory(
+                  post['image'],
+                  width: double.infinity,
+                  height: 220,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-
-            const Divider(),
-
-            Row(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
               children: [
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: _like,
-                  icon: Icon(
-                    _liked
-                        ? Icons.thumb_up
-                        : Icons.thumb_up_outlined,
-                  ),
-                  label: const Text('Like'),
-                  ),
-                ),
-
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: _dislike,
-                  icon: Icon(
-                    _disliked
-                        ? Icons.thumb_down
-                        : Icons.thumb_down_outlined,
-                  ),
-                  label: const Text('Dislike'),
-                  ),
-                ),
-
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: _comment,
-                  icon: const Icon(Icons.comment_outlined),
-                  label: const Text('Comment'),
-                  ),
-                ),
-
-                Expanded(
-                  child: TextButton.icon(
-                    onPressed: _share,
-                  icon: const Icon(Icons.share_outlined),
-                  label: const Text('Share'),
-                  ),
-                ),
+                const Icon(Icons.thumb_up, color: Colors.blue, size: 23),
+                const SizedBox(width: 8),
+                Text('${post['likes']}'),
+                const SizedBox(width: 55),
+                const Icon(Icons.thumb_down, color: Colors.black54, size: 23),
+                const SizedBox(width: 8),
+                Text('${post['dislikes']}'),
+                const SizedBox(width: 55),
+                const Icon(Icons.comment, color: Colors.black54, size: 23),
+                const SizedBox(width: 8),
+                Text('${post['comments']}'),
+                const SizedBox(width: 55),
+                const Icon(Icons.favorite, color: Colors.pink, size: 23),
+                const SizedBox(width: 8),
+                Text('${post['loves'] ?? 0}'),
               ],
             ),
+          ),
+          if ((post['commentText'] ?? '').toString().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.comment, color: Colors.green, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      post['commentText'].toString(),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          const Divider(height: 25),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(5, 0, 5, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _action(Icons.thumb_up_outlined, 'Like', post),
+                _action(Icons.thumb_down_outlined, 'Dislike', post),
+                _action(Icons.favorite_border, 'Love', post),
+                _action(Icons.comment_outlined, 'Comment', post),
+                _action(Icons.delete_outline, 'Delete', post),
+                _action(Icons.share_outlined, 'Share', post),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _action(IconData icon, String text, Map<String, dynamic> post) {
+    Color actionColor = Colors.black87;
+
+    if (text == 'Like' || text == 'Dislike') {
+      actionColor = Colors.blue;
+    } else if (text == 'Love') {
+      actionColor = Colors.pink;
+    } else if (text == 'Comment') {
+      actionColor = Colors.green;
+    } else if (text == 'Delete') {
+      actionColor = Colors.orange;
+    } else if (text == 'Share') {
+      actionColor = Colors.purple;
+    }
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          if (text == 'Delete') {
+            posts.remove(post);
+            return;
+          }
+
+          if (text == 'Like' || text == 'Dislike' || text == 'Love') {
+            final oldReaction = post['_reaction'];
+
+            // Same reaction = remove reaction
+            if (oldReaction == text) {
+              if (text == 'Like') {
+                post['likes'] = ((post['likes'] ?? 0) as num).toInt() - 1;
+              } else if (text == 'Dislike') {
+                post['dislikes'] = ((post['dislikes'] ?? 0) as num).toInt() - 1;
+              } else if (text == 'Love') {
+                post['loves'] = ((post['loves'] ?? 0) as num).toInt() - 1;
+              }
+
+              post['_reaction'] = null;
+              return;
+            }
+
+            // Remove previous reaction
+            if (oldReaction == text) {
+              if (text == 'Like') {
+                post['likes'] = (((post['likes'] ?? 0) as num).toInt() - 1)
+                    .clamp(0, 999999);
+              } else if (text == 'Dislike') {
+                post['dislikes'] =
+                    (((post['dislikes'] ?? 0) as num).toInt() - 1).clamp(
+                      0,
+                      999999,
+                    );
+              } else if (text == 'Love') {
+                post['loves'] = (((post['loves'] ?? 0) as num).toInt() - 1)
+                    .clamp(0, 999999);
+              }
+
+              post['_reaction'] = null;
+              return;
+            }
+
+            // Remove previous reaction
+            if (oldReaction == 'Like') {
+              post['likes'] = (((post['likes'] ?? 0) as num).toInt() - 1).clamp(
+                0,
+                999999,
+              );
+            } else if (oldReaction == 'Dislike') {
+              post['dislikes'] = (((post['dislikes'] ?? 0) as num).toInt() - 1)
+                  .clamp(0, 999999);
+            } else if (oldReaction == 'Love') {
+              post['loves'] = (((post['loves'] ?? 0) as num).toInt() - 1).clamp(
+                0,
+                999999,
+              );
+            }
+
+            // Add new reaction
+            if (text == 'Like') {
+              post['likes'] = (((post['likes'] ?? 0) as num).toInt() + 1);
+            } else if (text == 'Dislike') {
+              post['dislikes'] = (((post['dislikes'] ?? 0) as num).toInt() + 1);
+            } else if (text == 'Love') {
+              post['loves'] = (((post['loves'] ?? 0) as num).toInt() + 1);
+            }
+
+            post['_reaction'] = text;
+          }
+        });
+        if (text == 'Comment') {
+          _showCommentBox(post);
+        }
+
+        if (text == 'Share') {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text('Post shared!')));
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 3),
+        child: Column(
+          children: [
+            Icon(icon, size: 27, color: actionColor),
+            const SizedBox(height: 3),
+            Text(text, style: TextStyle(fontSize: 13, color: actionColor)),
           ],
         ),
       ),
     );
   }
+
+  void _showCommentBox(Map<String, dynamic> post) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Comment'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(hintText: 'Write a comment...'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (controller.text.trim().isNotEmpty) {
+                  setState(() {
+                    post['comments']++;
+                    post['commentText'] = controller.text.trim();
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Comment'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _simplePage(IconData icon, String title) {
+    if (title == 'Friends') {
+      final friends = _acceptedFriendRequests.toList();
+
+      return ListView(
+        padding: const EdgeInsets.all(18),
+        children: [
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              ),
+              const Text(
+                'Friends',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          ...friends.map(
+            (name) => Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: ListTile(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => ProfilePage(name: name)),
+                  );
+                },
+                contentPadding: const EdgeInsets.all(10),
+                leading: const CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Color(0xFFE0ECFF),
+                  child: Icon(Icons.person, color: Colors.blue, size: 32),
+                ),
+                title: Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: const Text('Socialbook User'),
+                trailing: ElevatedButton(
+                  onPressed:
+                      _acceptedFriendRequests.contains(name) ||
+                          _sentFriendRequests.contains(name)
+                      ? null
+                      : () {
+                          setState(() {
+                            _sentFriendRequests.add(name);
+                            _friendRequestNotifications.insert(0, {
+                              'name': name,
+                              'text': 'sent you a friend request',
+                              'time': 'Just now',
+                              'icon': Icons.person_add,
+                            });
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Friend request sent to $name'),
+                            ),
+                          );
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _sentFriendRequests.contains(name)
+                        ? Colors.grey
+                        : Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text(
+                    _acceptedFriendRequests.contains(name)
+                        ? 'Friends ✓'
+                        : (_sentFriendRequests.contains(name)
+                              ? 'Request Sent'
+                              : 'Add Friend'),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    if (title == 'Notifications') {
+      final notifications = [
+        {
+          'name': 'Rahul Das',
+          'text': 'liked your post',
+          'time': '5 min ago',
+          'icon': Icons.thumb_up,
+          'request': false,
+        },
+        {
+          'name': 'Amit Roy',
+          'text': 'commented on your post',
+          'time': '15 min ago',
+          'icon': Icons.comment,
+          'request': false,
+        },
+        {
+          'name': 'Suman Ghosh',
+          'text': 'sent you a friend request',
+          'time': 'Just now',
+          'icon': Icons.person_add,
+          'request': true,
+        },
+        {
+          'name': 'Rahul Das',
+          'text': 'sent you a friend request',
+          'time': 'Just now',
+          'icon': Icons.person_add,
+          'request': true,
+        },
+        {
+          'name': 'Amit Roy',
+          'text': 'sent you a friend request',
+          'time': 'Just now',
+          'icon': Icons.person_add,
+          'request': true,
+        },
+        {
+          'name': 'Socalbook Team',
+          'text': 'welcomed you to Socialbook',
+          'time': '2h ago',
+          'icon': Icons.notifications,
+          'request': false,
+        },
+      ];
+
+      return ListView(
+        padding: const EdgeInsets.all(18),
+        children: [
+          const Text(
+            'Notifications',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 15),
+          ...notifications
+              .where(
+                (item) =>
+                    !(item['request'] == true &&
+                        _declinedFriendRequests.contains(
+                          item['name'] as String,
+                        )),
+              )
+              .map((item) {
+                final name = item['name'] as String;
+                final isRequest = item['request'] as bool;
+                final accepted = _acceptedFriendRequests.contains(name);
+
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(12),
+                    leading: CircleAvatar(
+                      radius: 27,
+                      backgroundColor: const Color(0xFFE0ECFF),
+                      child: Icon(item['icon'] as IconData, color: Colors.blue),
+                    ),
+                    title: Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 4),
+                        Text(
+                          '${item['text']} • ${item['time']}',
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                        if (isRequest && !accepted) ...[
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _acceptedFriendRequests.add(name);
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          '$name is now your friend',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  child: const Text('Accept'),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _declinedFriendRequests.add(name);
+                                    });
+                                  },
+                                  child: const Text('Decline'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        if (isRequest && accepted)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: Text(
+                              'Friends ✓',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+        ],
+      );
+    }
+
+    if (title == 'Profile') {
+      return ListView(
+        padding: const EdgeInsets.all(18),
+        children: [
+          const SizedBox(height: 10),
+          Center(
+            child: Column(
+              children: [
+                const CircleAvatar(
+                  radius: 58,
+                  backgroundColor: Color(0xFFE0ECFF),
+                  child: Icon(Icons.person, size: 70, color: Colors.blue),
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  'Socialbook User',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  '@socialbookuser',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Edit Profile coming soon')),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('Edit Profile'),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 25),
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.article_outlined, color: Colors.blue),
+                  title: Text('My Posts'),
+                  trailing: Icon(Icons.chevron_right),
+                ),
+                Divider(height: 1),
+                ListTile(
+                  leading: Icon(Icons.people_outline, color: Colors.blue),
+                  title: Text('My Friends'),
+                  trailing: Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            _simplePage(Icons.people_outline, 'Friends'),
+                      ),
+                    );
+                  },
+                ),
+                Divider(height: 1),
+                ListTile(
+                  leading: Icon(Icons.settings_outlined, color: Colors.blue),
+                  title: Text('Settings'),
+                  trailing: Icon(Icons.chevron_right),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 75, color: Colors.blue),
+          const SizedBox(height: 15),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSearch() {
+    showSearch(context: context, delegate: SocialbookSearchDelegate());
+  }
+
+  void _showMessages() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MessagesPage()),
+    );
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final XFile? file = await picker.pickImage(source: ImageSource.gallery);
+
+    if (file != null) {
+      final bytes = await file.readAsBytes();
+      setState(() {
+        selectedImageBytes = bytes;
+      });
+    }
+  }
+
+  void _showCreatePost() {
+    final controller = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+            18,
+            18,
+            18,
+            MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Create Post',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 15),
+              TextField(
+                controller: controller,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  hintText: "What's on your mind?",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                child: selectedImageBytes != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.memory(
+                          selectedImageBytes!,
+                          height: 180,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              const SizedBox(height: 15),
+
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _pickImage,
+                  icon: const Icon(Icons.photo),
+                  label: const Text('Add Photo'),
+                ),
+              ),
+              const SizedBox(height: 15),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (controller.text.trim().isNotEmpty) {
+                      setState(() {
+                        posts.insert(0, {
+                          'name': 'Socialbook User',
+                          'time': 'Just now',
+                          'text': controller.text.trim(),
+                          'image': selectedImageBytes,
+                          'likes': 0,
+                          'dislikes': 0,
+                          'comments': 0,
+                        });
+                      });
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Post'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
-class CreateAccountPage extends StatefulWidget {
-  const CreateAccountPage({super.key});
+class SocialbookSearchDelegate extends SearchDelegate<String> {
+  final users = [
+    'Rahul Das',
+    'Amit Roy',
+    'Suman Ghosh',
+    'Arjun Singh',
+    'Priya Sharma',
+    'Socialbook Team',
+  ];
 
   @override
-  State<CreateAccountPage> createState() => _CreateAccountPageState();
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      if (query.isNotEmpty)
+        IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => close(context, ''),
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return _results(context);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return _results(context);
+  }
+
+  Widget _results(BuildContext context) {
+    final results = users
+        .where((name) => name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+
+    return ListView(
+      padding: const EdgeInsets.all(12),
+      children: results.map((name) {
+        return Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: ListTile(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ProfilePage(name: name)),
+              );
+            },
+            leading: const CircleAvatar(
+              backgroundColor: Color(0xFFE0ECFF),
+              child: Icon(Icons.person, color: Colors.blue),
+            ),
+            title: Text(
+              name,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: const Text('Socialbook User'),
+            trailing: const Icon(Icons.chevron_right, color: Colors.blue),
+          ),
+        );
+      }).toList(),
+    );
+  }
 }
 
-class _CreateAccountPageState extends State<CreateAccountPage> {
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+class MessagesPage extends StatelessWidget {
+  const MessagesPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final messages = [
+      ['Rahul Das', 'Hi! Welcome to Socialbook 👋', '5 min ago'],
+      ['Amit Roy', 'How are you?', '15 min ago'],
+      ['Suman Ghosh', 'Thanks for adding me!', '1h ago'],
+      ['Socialbook Team', 'Welcome to Socialbook!', '2h ago'],
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Messages',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(12),
+        children: messages.map((message) {
+          return Card(
+            margin: const EdgeInsets.only(bottom: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(10),
+              leading: const CircleAvatar(
+                radius: 27,
+                backgroundColor: Color(0xFFE0ECFF),
+                child: Icon(Icons.person, color: Colors.blue, size: 30),
+              ),
+              title: Text(
+                message[0],
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              subtitle: Text(message[1]),
+              trailing: Text(
+                message[2],
+                style: const TextStyle(color: Colors.grey),
+              ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(userName: message[0]),
+                  ),
+                );
+              },
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class ChatPage extends StatefulWidget {
+  final String userName;
+
+  const ChatPage({super.key, required this.userName});
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  final TextEditingController controller = TextEditingController();
+
+  final List<String> messages = [
+    'Hi! Welcome to Socialbook 👋',
+    'How are you?',
+  ];
+
+  void sendMessage() {
+    final text = controller.text.trim();
+
+    if (text.isEmpty) return;
+
+    setState(() {
+      messages.add(text);
+      controller.clear();
+    });
+  }
 
   @override
   void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    passwordController.dispose();
+    controller.dispose();
     super.dispose();
-  }
-
-  Future<void> createAccount() async {
-    final name = nameController.text.trim();
-    final email = emailController.text.trim();
-    final password = passwordController.text;
-
-    if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
-      return;
-    }
-
-    if (password.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Password must be at least 6 characters'),
-        ),
-      );
-      return;
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setString('account_name', name);
-    await prefs.setString('account_email', email);
-    await prefs.setString('account_password', password);
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Account created successfully!')),
-    );
-
-    await Future.delayed(const Duration(milliseconds: 700));
-
-    if (!mounted) return;
-    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create New Account'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        title: Row(
           children: [
-            const SizedBox(height: 60),
-
-            const Text(
-              'Create your Socialbook account',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
+            const CircleAvatar(
+              backgroundColor: Color(0xFFE0ECFF),
+              child: Icon(Icons.person, color: Colors.blue),
             ),
-
-            const SizedBox(height: 50),
-
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Full name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email or phone',
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: createAccount,
-                child: const Text(
-                  'Sign Up',
-                  style: TextStyle(fontSize: 17),
-                ),
-              ),
+            const SizedBox(width: 10),
+            Text(
+              widget.userName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
         ),
       ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final isMine = index == messages.length - 1;
+
+                return Align(
+                  alignment: isMine
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 11,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isMine ? Colors.blue : const Color(0xFFEFF2F8),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    child: Text(
+                      messages[index],
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: isMine ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: controller,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => sendMessage(),
+                      decoration: InputDecoration(
+                        hintText: 'Write a message...',
+                        filled: true,
+                        fillColor: const Color(0xFFF1F3F8),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.blue,
+                    child: IconButton(
+                      icon: const Icon(Icons.send, color: Colors.white),
+                      onPressed: sendMessage,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
-
