@@ -900,6 +900,7 @@ class _HomePageState extends State<HomePage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ElevatedButton(
+              style: ElevatedButton.styleFrom(minimumSize: Size.zero, padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8), tapTargetSize: MaterialTapTargetSize.shrinkWrap, textStyle: const TextStyle(fontSize: 12)),
                             onPressed: () {
                               setState(() {
                                 _acceptedFriendRequests.add(name);
@@ -910,6 +911,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           const SizedBox(width: 6),
                           OutlinedButton(
+              style: OutlinedButton.styleFrom(minimumSize: Size.zero, padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8), tapTargetSize: MaterialTapTargetSize.shrinkWrap, textStyle: const TextStyle(fontSize: 12)),
                             onPressed: () {
                               setState(() {
                                 _declinedFriendRequests.add(name);
