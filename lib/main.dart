@@ -667,7 +667,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(width: 15),
                 const Icon(Icons.favorite, color: Colors.pink, size: 23),
                 const SizedBox(width: 8),
-                Text('${post['loves']}'),
+                Text('${post['loves'] ?? 0}'),
                 const SizedBox(width: 15),
                 const Icon(Icons.comment, color: Colors.black54, size: 23),
                 const SizedBox(width: 8),
