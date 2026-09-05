@@ -424,19 +424,19 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
+            constraints: const BoxConstraints(minWidth: 30, minHeight: 40),
             icon: const Icon(Icons.add, size: 22, color: Color(0xFFD81B60)),
             onPressed: _showCreateMenu,
           ),
           IconButton(
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
+            constraints: const BoxConstraints(minWidth: 30, minHeight: 40),
             icon: const Icon(Icons.search, size: 22, color: Color(0xFFD81B60)),
             onPressed: _showSearch,
           ),
           IconButton(
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
+            constraints: const BoxConstraints(minWidth: 30, minHeight: 40),
             icon: const Icon(
               Icons.chat_bubble_outline,
               size: 22,
@@ -446,7 +446,7 @@ class _HomePageState extends State<HomePage> {
           ),
           IconButton(
             padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
+            constraints: const BoxConstraints(minWidth: 30, minHeight: 40),
             icon: const Icon(
               Icons.account_circle_outlined,
               size: 22,
