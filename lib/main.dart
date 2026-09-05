@@ -423,18 +423,30 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
+            style: IconButton.styleFrom(
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 30, minHeight: 40),
             icon: const Icon(Icons.add, size: 22, color: Color(0xFFD81B60)),
             onPressed: _showCreateMenu,
           ),
           IconButton(
+            style: IconButton.styleFrom(
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 30, minHeight: 40),
             icon: const Icon(Icons.search, size: 22, color: Color(0xFFD81B60)),
             onPressed: _showSearch,
           ),
           IconButton(
+            style: IconButton.styleFrom(
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 30, minHeight: 40),
             icon: const Icon(
@@ -445,6 +457,10 @@ class _HomePageState extends State<HomePage> {
             onPressed: _showMessages,
           ),
           IconButton(
+            style: IconButton.styleFrom(
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 30, minHeight: 40),
             icon: const Icon(
