@@ -423,25 +423,33 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, size: 27, color: Color(0xFFD81B60)),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
+            icon: const Icon(Icons.add, size: 22, color: Color(0xFFD81B60)),
             onPressed: _showCreateMenu,
           ),
           IconButton(
-            icon: const Icon(Icons.search, size: 27, color: Color(0xFFD81B60)),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
+            icon: const Icon(Icons.search, size: 22, color: Color(0xFFD81B60)),
             onPressed: _showSearch,
           ),
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
             icon: const Icon(
               Icons.chat_bubble_outline,
-              size: 29,
+              size: 22,
               color: Color(0xFFD81B60),
             ),
             onPressed: _showMessages,
           ),
           IconButton(
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 40),
             icon: const Icon(
               Icons.account_circle_outlined,
-              size: 32,
+              size: 22,
               color: Color(0xFFD81B60),
             ),
             onPressed: () {},
@@ -900,7 +908,15 @@ class _HomePageState extends State<HomePage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ElevatedButton(
-              style: ElevatedButton.styleFrom(minimumSize: Size.zero, padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8), tapTargetSize: MaterialTapTargetSize.shrinkWrap, textStyle: const TextStyle(fontSize: 12)),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 8,
+                              ),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              textStyle: const TextStyle(fontSize: 12),
+                            ),
                             onPressed: () {
                               setState(() {
                                 _acceptedFriendRequests.add(name);
@@ -911,7 +927,15 @@ class _HomePageState extends State<HomePage> {
                           ),
                           const SizedBox(width: 6),
                           OutlinedButton(
-              style: OutlinedButton.styleFrom(minimumSize: Size.zero, padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8), tapTargetSize: MaterialTapTargetSize.shrinkWrap, textStyle: const TextStyle(fontSize: 12)),
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 8,
+                              ),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              textStyle: const TextStyle(fontSize: 12),
+                            ),
                             onPressed: () {
                               setState(() {
                                 _declinedFriendRequests.add(name);
