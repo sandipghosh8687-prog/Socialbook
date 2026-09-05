@@ -1,17 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-
-import 'firebase_options.dart';
-
-import 'live_page.dart';
-import 'watch_live_page.dart';
-import 'post_video_player.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -165,99 +155,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+void main() {
   runApp(
     const MaterialApp(debugShowCheckedModeBanner: false, home: LoginPage()),
   );
-}
-
-class ProfilePage extends StatefulWidget {
-  final String name;
-
-  const ProfilePage({super.key, required this.name});
-
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
-}
-
-class _ProfilePageState extends State<ProfilePage> {
-  final Set<String> friends = {'Rahul Das', 'Suman Ghosh', 'Amit Roy'};
-  bool get isFriend => _acceptedFriendRequests.contains(widget.name);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircleAvatar(
-              radius: 55,
-              backgroundColor: Color(0xFFE0ECFF),
-              child: Icon(Icons.person, color: Colors.blue, size: 60),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              widget.name,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text('Socialbook User', style: TextStyle(fontSize: 17)),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed:
-                  (_sentFriendRequests.contains(widget.name) && !isFriend)
-                  ? null
-                  : () async {
-                      if (isFriend) {
-                        setState(() {
-                          _acceptedFriendRequests.remove(widget.name);
-                        });
-                        await _saveAcceptedFriends();
-                        if (!context.mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '${widget.name} removed from friends',
-                            ),
-                          ),
-                        );
-                      } else {
-                        setState(() {
-                          _sentFriendRequests.add(widget.name);
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Friend request sent to ${widget.name}',
-                            ),
-                          ),
-                        );
-                      }
-                    },
-              icon: Icon(
-                isFriend
-                    ? Icons.people
-                    : (_sentFriendRequests.contains(widget.name)
-                          ? Icons.schedule
-                          : Icons.person_add),
-              ),
-              label: Text(
-                isFriend
-                    ? 'Friends ✓'
-                    : (_sentFriendRequests.contains(widget.name)
-                          ? 'Request Sent'
-                          : 'Add Friend'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class SocialbookApp extends StatelessWidget {
@@ -278,24 +179,6 @@ class SocialbookApp extends StatelessWidget {
   }
 }
 
-final Set<String> _sentFriendRequests = {};
-final Set<String> _acceptedFriendRequests = {};
-Future<void> _saveAcceptedFriends() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setStringList(
-    "accepted_friends",
-    _acceptedFriendRequests.toList(),
-  );
-}
-
-Future<void> _loadAcceptedFriends() async {
-  final prefs = await SharedPreferences.getInstance();
-  final saved = prefs.getStringList("accepted_friends") ?? [];
-  _acceptedFriendRequests
-    ..clear()
-    ..addAll(saved);
-}
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -304,64 +187,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    _loadAcceptedFriends().then((_) {
-      if (mounted) setState(() {});
-    });
-    _loadRefusedFriends();
-    _listenToOnlinePosts();
-  }
-
-  final List<Map<String, dynamic>> _friendRequestNotifications = [];
-  final Set<String> _declinedFriendRequests = {};
-  void _listenToOnlinePosts() {
-    FirebaseFirestore.instance
-        .collection('posts')
-        .orderBy('createdAt', descending: true)
-        .snapshots()
-        .listen((snapshot) {
-          if (mounted == false) return;
-          final onlinePosts = snapshot.docs.map((doc) {
-            final data = doc.data();
-            return <String, dynamic>{
-              ...data,
-              'documentId': doc.id,
-              'online': true,
-              'time': 'Just now',
-              'likes': data['likes'] ?? 0,
-              'dislikes': data['dislikes'] ?? 0,
-              'comments': data['comments'] ?? 0,
-            };
-          }).toList();
-          setState(() {
-            posts.removeWhere((post) => post['online'] == true);
-            posts.insertAll(0, onlinePosts);
-          });
-        });
-  }
-
-  Future<void> _saveRefusedFriends() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(
-      'declined_friends',
-      _declinedFriendRequests.toList(),
-    );
-  }
-
-  Future<void> _loadRefusedFriends() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getStringList('declined_friends') ?? [];
-    _declinedFriendRequests
-      ..clear()
-      ..addAll(saved);
-    if (mounted) setState(() {});
-  }
-
+  final Set<String> _sentFriendRequests = {};
   int selectedTab = 0;
   Uint8List? selectedImageBytes;
-  String? selectedVideoPath;
 
   final List<Map<String, dynamic>> posts = [
     {
@@ -415,7 +243,7 @@ class _HomePageState extends State<HomePage> {
               'Socialbook',
               style: TextStyle(
                 color: Color(0xFFD81B60),
-                fontSize: 21,
+                fontSize: 27,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -423,11 +251,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, size: 27, color: Color(0xFFD81B60)),
-            onPressed: _showCreateMenu,
-          ),
-          IconButton(
-            icon: const Icon(Icons.search, size: 27, color: Color(0xFFD81B60)),
+            icon: const Icon(Icons.search, size: 31, color: Color(0xFFD81B60)),
             onPressed: _showSearch,
           ),
           IconButton(
@@ -458,19 +282,24 @@ class _HomePageState extends State<HomePage> {
           _simplePage(Icons.person_outline, 'Profile'),
         ],
       ),
+      floatingActionButton: selectedTab == 0
+          ? FloatingActionButton(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              onPressed: () {
+                _showCreatePost();
+              },
+              child: const Icon(Icons.add, size: 38),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         backgroundColor: Colors.white,
         indicatorColor: const Color(0xFFE0ECFF),
         labelTextStyle: WidgetStatePropertyAll(
           const TextStyle(color: Colors.blue),
         ),
         selectedIndex: selectedTab,
-        onDestinationSelected: (index) async {
-          if (index == 1) {
-            await _loadAcceptedFriends();
-          }
-          if (!context.mounted) return;
+        onDestinationSelected: (index) {
           setState(() {
             selectedTab = index;
           });
@@ -615,20 +444,6 @@ class _HomePageState extends State<HomePage> {
               child: Text(post['text'], style: const TextStyle(fontSize: 19)),
             ),
           ),
-          if (post['image'] != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: Image.memory(
-                  post['image'],
-                  width: double.infinity,
-                  height: 220,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          if (post['video'] != null) PostVideoPlayer(path: post['video']),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -821,9 +636,7 @@ class _HomePageState extends State<HomePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (controller.text.trim().isNotEmpty ||
-                    selectedImageBytes != null ||
-                    selectedVideoPath != null) {
+                if (controller.text.trim().isNotEmpty) {
                   setState(() {
                     post['comments']++;
                     post['commentText'] = controller.text.trim();
@@ -840,31 +653,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _simplePage(IconData icon, String title) {
-    if (title == 'Friends' || title == 'My Friends') {
-      final friends = title == 'My Friends'
-          ? _acceptedFriendRequests.toList()
-          : {'Rahul Das', 'Suman Ghosh', 'Amit Roy'}
-                .where(
-                  (name) =>
-                      _acceptedFriendRequests.contains(name) == false &&
-                      _declinedFriendRequests.contains(name) == false,
-                )
-                .toList();
+    if (title == 'Friends') {
+      final friends = [
+        'Rahul Das',
+        'Amit Roy',
+        'Suman Ghosh',
+        'Arjun Singh',
+        'Priya Sharma',
+      ];
 
       return ListView(
         padding: const EdgeInsets.all(18),
         children: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => Navigator.pop(context),
-              ),
-              Text(
-                title,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-              ),
-            ],
+          const Text(
+            'Friends',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
           ...friends.map(
@@ -874,12 +677,6 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: ListTile(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => ProfilePage(name: name)),
-                  );
-                },
                 contentPadding: const EdgeInsets.all(10),
                 leading: const CircleAvatar(
                   radius: 28,
@@ -894,32 +691,29 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 subtitle: const Text('Socialbook User'),
-                trailing: title == 'My Friends'
-                    ? const Chip(label: Text('Friends ✓'))
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _acceptedFriendRequests.add(name);
-                                _saveAcceptedFriends();
-                              });
-                            },
-                            child: const Text('Accept'),
-                          ),
-                          const SizedBox(width: 6),
-                          OutlinedButton(
-                            onPressed: () {
-                              setState(() {
-                                _declinedFriendRequests.add(name);
-                                _saveRefusedFriends();
-                              });
-                            },
-                            child: const Text('Refuse'),
-                          ),
-                        ],
-                      ),
+                trailing: ElevatedButton(
+                  onPressed: _sentFriendRequests.contains(name)
+    ? null
+    : () {
+        setState(() {
+          _sentFriendRequests.add(name);
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Friend request sent to $name')),
+        );
+      },
+style: ElevatedButton.styleFrom(
+  backgroundColor: _sentFriendRequests.contains(name)
+      ? Colors.grey
+      : Colors.blue,
+  foregroundColor: Colors.white,
+),
+child: Text(
+  _sentFriendRequests.contains(name)
+      ? 'Request Sent'
+      : 'Add Friend',
+),
+                ),
               ),
             ),
           ),
@@ -934,42 +728,24 @@ class _HomePageState extends State<HomePage> {
           'text': 'liked your post',
           'time': '5 min ago',
           'icon': Icons.thumb_up,
-          'request': false,
         },
         {
           'name': 'Amit Roy',
           'text': 'commented on your post',
           'time': '15 min ago',
           'icon': Icons.comment,
-          'request': false,
         },
         {
           'name': 'Suman Ghosh',
           'text': 'sent you a friend request',
-          'time': 'Just now',
+          'time': '1h ago',
           'icon': Icons.person_add,
-          'request': true,
         },
         {
-          'name': 'Rahul Das',
-          'text': 'sent you a friend request',
-          'time': 'Just now',
-          'icon': Icons.person_add,
-          'request': true,
-        },
-        {
-          'name': 'Amit Roy',
-          'text': 'sent you a friend request',
-          'time': 'Just now',
-          'icon': Icons.person_add,
-          'request': true,
-        },
-        {
-          'name': 'Socalbook Team',
+          'name': 'Socialbook Team',
           'text': 'welcomed you to Socialbook',
           'time': '2h ago',
           'icon': Icons.notifications,
-          'request': false,
         },
       ];
 
@@ -981,104 +757,37 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 15),
-          ...notifications
-              .where(
-                (item) =>
-                    !(item['request'] == true &&
-                        _declinedFriendRequests.contains(
-                          item['name'] as String,
-                        )),
-              )
-              .map((item) {
-                final name = item['name'] as String;
-                final isRequest = item['request'] as bool;
-                final accepted = _acceptedFriendRequests.contains(name);
-
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+          ...notifications.map(
+            (item) => Card(
+              margin: const EdgeInsets.only(bottom: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: ListTile(
+                contentPadding: const EdgeInsets.all(12),
+                leading: CircleAvatar(
+                  radius: 27,
+                  backgroundColor: const Color(0xFFE0ECFF),
+                  child: Icon(
+                    item['icon'] as IconData,
+                    color: Colors.blue,
+                    size: 28,
                   ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(12),
-                    leading: CircleAvatar(
-                      radius: 27,
-                      backgroundColor: const Color(0xFFE0ECFF),
-                      child: Icon(item['icon'] as IconData, color: Colors.blue),
-                    ),
-                    title: Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          '${item['text']} • ${item['time']}',
-                          style: const TextStyle(fontSize: 15),
-                        ),
-                        if (isRequest && !accepted) ...[
-                          const SizedBox(height: 10),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _acceptedFriendRequests.add(name);
-                                      _saveAcceptedFriends();
-                                    });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          '$name is now your friend',
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text('Accept'),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _declinedFriendRequests.add(name);
-                                      _saveRefusedFriends();
-                                      _sentFriendRequests.remove(name);
-                                    });
-                                  },
-                                  child: const Text('Refuse'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                        if (isRequest && accepted)
-                          const Padding(
-                            padding: EdgeInsets.only(top: 8),
-                            child: Text(
-                              'Friends ✓',
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                ),
+                title: Text(
+                  item['name'] as String,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
                   ),
-                );
-              }),
+                ),
+                subtitle: Text(
+                  '${item['text']} • ${item['time']}',
+                  style: const TextStyle(fontSize: 15),
+                ),
+              ),
+            ),
+          ),
         ],
       );
     }
@@ -1127,7 +836,7 @@ class _HomePageState extends State<HomePage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Column(
+            child: const Column(
               children: [
                 ListTile(
                   leading: Icon(Icons.article_outlined, color: Colors.blue),
@@ -1139,15 +848,6 @@ class _HomePageState extends State<HomePage> {
                   leading: Icon(Icons.people_outline, color: Colors.blue),
                   title: Text('My Friends'),
                   trailing: Icon(Icons.chevron_right),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            _simplePage(Icons.people_outline, 'My Friends'),
-                      ),
-                    );
-                  },
                 ),
                 Divider(height: 1),
                 ListTile(
@@ -1198,80 +898,6 @@ class _HomePageState extends State<HomePage> {
         selectedImageBytes = bytes;
       });
     }
-  }
-
-  Future<void> _pickVideo() async {
-    final picker = ImagePicker();
-    final XFile? file = await picker.pickVideo(source: ImageSource.gallery);
-    if (file == null) return;
-    final bytes = await file.readAsBytes();
-    final ref = FirebaseStorage.instance.ref().child(
-      "post_videos/${DateTime.now().millisecondsSinceEpoch}.mp4",
-    );
-    await ref.putData(bytes, SettableMetadata(contentType: "video/mp4"));
-    final url = await ref.getDownloadURL();
-    if (mounted == false) return;
-    setState(() {
-      selectedVideoPath = url;
-      selectedImageBytes = null;
-    });
-  }
-
-  void _showCreateMenu() {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.edit, color: Color(0xFFD81B60)),
-                title: const Text('Create Post'),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  _showCreatePost();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_library, color: Colors.green),
-                title: const Text('Photo/Video'),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  _showCreatePost();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.live_tv, color: Colors.red),
-                title: const Text('Watch Live'),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const WatchLivePage()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.videocam, color: Colors.red),
-                title: const Text('Go Live'),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LivePage()),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   void _showCreatePost() {
@@ -1332,31 +958,18 @@ class _HomePageState extends State<HomePage> {
                   label: const Text('Add Photo'),
                 ),
               ),
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: _pickVideo,
-                  icon: const Icon(Icons.video_library),
-                  label: const Text("Add Video"),
-                ),
-              ),
               const SizedBox(height: 15),
 
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    if (controller.text.trim().isNotEmpty ||
-                        selectedImageBytes != null ||
-                        selectedVideoPath != null) {
+                  onPressed: () {
+                    if (controller.text.trim().isNotEmpty) {
                       setState(() {
                         posts.insert(0, {
                           'name': 'Socialbook User',
                           'time': 'Just now',
                           'text': controller.text.trim(),
-                          'image': selectedImageBytes,
-                          'video': selectedVideoPath,
                           'likes': 0,
                           'dislikes': 0,
                           'comments': 0,
@@ -1404,15 +1017,15 @@ class SocialbookSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return _results(context);
+    return _results();
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return _results(context);
+    return _results();
   }
 
-  Widget _results(BuildContext context) {
+  Widget _results() {
     final results = users
         .where((name) => name.toLowerCase().contains(query.toLowerCase()))
         .toList();
@@ -1425,12 +1038,6 @@ class SocialbookSearchDelegate extends SearchDelegate<String> {
             borderRadius: BorderRadius.circular(15),
           ),
           child: ListTile(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => ProfilePage(name: name)),
-              );
-            },
             leading: const CircleAvatar(
               backgroundColor: Color(0xFFE0ECFF),
               child: Icon(Icons.person, color: Colors.blue),
